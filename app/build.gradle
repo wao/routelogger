@@ -1,0 +1,86 @@
+buildscript {
+    repositories{
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+        classpath 'me.tatarka:gradle-retrolambda:3.2.1'
+        classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
+    }
+
+    configurations.classpath.exclude group: 'com.android.tools.external.lombok'
+}
+
+
+apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
+apply plugin: 'me.tatarka.retrolambda'
+
+repositories{
+    mavenLocal()
+    jcenter()
+}
+
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "info.thinkmore.android.routelogger"
+        minSdkVersion 9
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    apt {
+        arguments {
+            androidManifestFile variant.outputs[0].processResources.manifestFile
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+
+    provided 'org.projectlombok:lombok:1.16.4'
+    apt 'org.projectlombok:lombok:1.16.4'
+    apt "org.androidannotations:androidannotations:3.3.+"
+    compile 'org.androidannotations:androidannotations-api:3.3.+'
+    compile 'com.android.support:support-v4:23.1.1'
+    compile 'info.thinkmore:simple-assert:1.0-SNAPSHOT'
+
+    compile 'ch.acra:acra:4.6.+'
+
+    // Robolectric
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.apache.maven:maven-ant-tasks:2.1.3'
+    // fixes issue on linux/mac
+    testCompile('org.robolectric:robolectric:2.4') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    }
+    // Testing-only dependencies
+    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+    androidTestCompile 'com.android.support.test:runner:0.4.+'
+    androidTestCompile 'com.android.support.test:rules:0.4.+'
+    androidTestCompile ( 'com.android.support.test.espresso:espresso-core:2.2.+' ){
+        exclude group: 'com.android.support', module: 'suport-annotations'
+    }
+}
